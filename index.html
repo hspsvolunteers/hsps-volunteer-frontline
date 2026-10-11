@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支援前線｜皮克敏志工物資大募集 互動計分器</title>
+    <meta name="description" content="支援前線互動計分器：皮克敏主題、等角立體風格的四隊搶答計分系統，支援三階段回合揭曉與名次遞減計分。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="viewport">
+  <main id="stage" class="stage" data-phase="1">
+
+    <!-- ===== 上半部 60%：所有互動與資訊 ===== -->
+    <section class="top-zone" aria-label="計分主畫面">
+      <header class="hud">
+        <div class="brand">
+          <svg class="brand-cube" viewBox="0 0 100 100" aria-hidden="true">
+            <polygon points="50,8 90,30 50,52 10,30" fill="#b6e37a"/>
+            <polygon points="10,30 50,52 50,96 10,74" fill="#7cc24a"/>
+            <polygon points="90,30 50,52 50,96 90,74" fill="#4f8f2b"/>
+            <polygon points="50,18 70,29 50,40 30,29" fill="#ffc93d"/>
+          </svg>
+          <div class="brand-text">
+            <h1>支援前線</h1>
+            <p>皮皮志工 物資大募集</p>
+          </div>
+        </div>
+        <div class="scoreboard" id="scoreboard"></div>
+      </header>
+
+      <div class="main">
+        <div class="arena" id="arena"></div>
+
+        <aside class="tower">
+          <div class="tracker">
+            <div class="tracker-head">
+              <span class="eyebrow">ROUND</span>
+              <span class="tracker-round" id="trackerRound">第一回合</span>
+            </div>
+            <div class="tracker-steps" id="trackerSteps"></div>
+            <div class="tracker-phases" id="trackerPhases">
+              <span data-p="1">情境</span>
+              <span data-p="2">代表</span>
+              <span data-p="3">物資</span>
+            </div>
+          </div>
+
+          <button id="actionBtn" class="action-btn" type="button">
+            <span class="action-face">
+              <span class="action-label" id="actionLabel">邀請代表上台</span>
+              <span class="action-sub" id="actionSub">空白鍵</span>
+            </span>
+          </button>
+
+          <div class="utils">
+            <button id="undoBtn" class="util-btn" type="button">復原上一筆</button>
+            <button id="resetBtn" class="util-btn" type="button">重新開始</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===== 下半部 40%：舞台安全留白（純裝飾） ===== -->
+    <section class="deco-zone" id="deco" aria-hidden="true"></section>
+
+    <div class="safe-guide" aria-hidden="true"><span>舞台安全線 60%</span></div>
+    <div class="fx-layer" id="fx" aria-hidden="true"></div>
+
+    <!-- 確認視窗 -->
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-card">
+        <h2 id="modalTitle">確定要重新開始嗎？</h2>
+        <p>所有隊伍的累計分數將歸零，並回到第一回合。</p>
+        <div class="modal-actions">
+          <button id="modalCancel" class="pill-btn ghost" type="button">取消</button>
+          <button id="modalOk" class="pill-btn danger" type="button">確定重新開始</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
