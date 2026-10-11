@@ -16,6 +16,21 @@ window.GAME_DATA = {
 
   rounds: [
     {
+      title: '試玩題',
+      theme: '歡迎加入志工團',
+      isPractice: true,
+      intro: [
+        '歡迎大家來到志工團大家庭',
+        '我們破冰遊戲即將開始',
+        '請各組就支援位置！'
+      ],
+      groups: [
+        { name: '團長', leader: '怡如', role: '團長', supply: '講解志工倫理讓大家取得特殊訓時數，需要各組全員到齊', quantity: '各組報到人數', unit: '人' },
+        { name: '副團長', leader: '依晴', role: '副團長', supply: '需要大家互相認識，彼此熟悉，請大家順時針各報姓名一次', quantity: 1, unit: '輪' },
+        { name: '副團長', leader: '依倫', role: '副團長', supply: '歡迎大家來到志工迎新，參加今天暖身活動，請找出椅背上名條', quantity: 3, unit: '張' }
+      ]
+    },
+    {
       title: '第一回合',
       theme: '課業輔導',
       intro: [
@@ -40,7 +55,7 @@ window.GAME_DATA = {
       ],
       groups: [
         { name: '園藝組', leader: '純敏', supply: '綠色元素物品', quantity: 3, unit: '件' },
-        { name: '圖書組', leader: '維雲', supply: '紙製品', quantity: 3, unit: '件' },
+        { name: '圖書組', leader: '維云', supply: '紙製品', quantity: 3, unit: '件' },
         { name: '交通組', leader: '瑞芳', supply: '鑰匙、雨具', quantity: 2, unit: '件' }
       ]
     },

@@ -14,7 +14,7 @@
   const TEAMS = DATA.teams;
   const ROUNDS = DATA.rounds;
   const POINTS = DATA.points;
-  const STORE_KEY = 'support-frontline-state-v1';
+  const STORE_KEY = 'support-frontline-state-v7';
   const NUM_ZH = ['一', '二', '三', '四', '五', '六'];
 
   const PIK_COLORS = {
@@ -28,6 +28,8 @@
   const fresh = () => ({
     round: 0,
     phase: 1,             // 1 情境｜2 代表｜3 物資計分｜'final' 最終
+    revealIdx: 0,         // 物資逐組放大介紹：0, 1, 2...；-1 代表已介紹完畢進入「物資募集中」總覽
+    started: false,       // 階段 3 是否已開始支援（已倒數完畢）
     totals: Object.fromEntries(TEAMS.map(t => [t.id, 0])),
     order: []             // 本回合完成順序（team id）
   });
@@ -37,7 +39,11 @@
   function load() {
     try {
       const s = JSON.parse(localStorage.getItem(STORE_KEY));
-      if (s && typeof s.round === 'number' && s.totals && Array.isArray(s.order)) return s;
+      if (s && typeof s.round === 'number' && s.totals && Array.isArray(s.order)) {
+        if (typeof s.started !== 'boolean') s.started = false;
+        if (typeof s.revealIdx !== 'number') s.revealIdx = -1;
+        return s;
+      }
     } catch (e) { /* ignore */ }
     return fresh();
   }
@@ -56,6 +62,13 @@
   const undoBtn = $('#undoBtn');
   const resetBtn = $('#resetBtn');
   const modal = $('#modal');
+  const startModal = $('#startModal');
+  const startModalOk = $('#startModalOk');
+  const startPiks = $('#startPiks');
+  const countdownOverlay = $('#countdownOverlay');
+  const countdownClose = $('#countdownClose');
+  const countdownSub = $('#countdownSub');
+  const countdownNum = $('#countdownNum');
   const fx = $('#fx');
 
   /* ---------------- 縮放成 16:9 ---------------- */
@@ -252,56 +265,136 @@
       arena.innerHTML = `
         <div class="strip">
           <span class="chip green">${r.title}</span>
-          <span class="strip-text">代表就位<em>請以下組長上台準備</em></span>
+          <span class="strip-text">代表就位<em>請以下代表上台準備</em></span>
         </div>
         <div class="crew n${n}">
-          ${r.groups.map((g, i) => `
+          ${r.groups.map((g, i) => {
+            const role = g.role || (g.name === '團長' ? '團長' : '組長');
+            return `
             <article class="gcard iso-card" style="animation-delay:${0.1 + i * 0.16}s">
               ${numCube(i + 1)}
               <span class="gcard-eyebrow">需要支援</span>
               <h3 class="gcard-name">${g.name}</h3>
-              <span class="gcard-leader"><small>組長</small><b>${g.leader}</b></span>
+              <span class="gcard-leader"><small>${role}</small><b>${g.leader}</b></span>
               <span class="gcard-call">請上台</span>
-            </article>`).join('')}
+            </article>`;
+          }).join('')}
         </div>`;
       return;
     }
 
     // phase 3
     const teamCycle = ['blue', 'yellow', 'red', 'purple'];
+
+    // 模式 A：逐組放大介紹所需物資 (state.revealIdx >= 0)
+    if (state.revealIdx >= 0) {
+      const idx = state.revealIdx;
+      const g = r.groups[idx];
+      const role = g.role || (g.name === '團長' ? '團長' : '組長');
+      const isTextQty = typeof g.quantity === 'string' && g.quantity.length > 2;
+      const isLongSupply = g.supply.length > 14;
+
+      const stripHTML = r.treasure
+        ? `<div class="strip">
+             <span class="chip green">${r.title}</span>
+             <span class="chip cream">${r.theme}</span>
+             <div class="treasure">${treasureChest()}<span class="treasure-tag">尋寶提示</span><span>${r.treasure.replace(/^尋寶任務｜/, '')}</span></div>
+           </div>`
+        : `<div class="strip">
+             <span class="chip green">${r.title}</span>
+             <span class="chip cream">${r.theme}</span>
+             <span class="strip-text">物資逐組揭曉<em>第 ${idx + 1} / ${n} 組需求</em></span>
+           </div>`;
+
+      arena.className = 'arena phase-3';
+      arena.innerHTML = `
+        ${stripHTML}
+        <article class="spotlight-card iso-card">
+          <div class="spotlight-head">
+            <div class="spotlight-badge">
+              <span class="spotlight-idx">第 ${idx + 1} 組需求</span>
+            </div>
+            <div class="spotlight-who">
+              <h2 class="spotlight-name">${g.name}</h2>
+              <span class="spotlight-leader"><small>${role}</small><b>${g.leader}</b></span>
+            </div>
+          </div>
+          <div class="spotlight-body">
+            <div class="spotlight-supply-wrap">
+              <span class="spotlight-label">需求物資</span>
+              <p class="spotlight-supply${isLongSupply ? ' long' : ''}">${g.supply}</p>
+            </div>
+            <div class="spotlight-qty-wrap">
+              <span class="spotlight-label">所需數量</span>
+              <div class="spotlight-qty${isTextQty ? ' text-qty' : ''}">
+                <b>${g.quantity}</b>
+                <small>${g.unit || '件'}</small>
+              </div>
+            </div>
+          </div>
+          <div class="spotlight-footer">
+            <div class="spotlight-steps">
+              ${r.groups.map((grp, i) => `
+                <span class="spotlight-step${i === idx ? ' on' : i < idx ? ' done' : ''}">
+                  <i>${i + 1}</i>
+                  <b>${grp.name}</b>
+                  <small>${grp.leader}</small>
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        </article>`;
+      return;
+    }
+
+    // 模式 B：物資募集中總覽 (state.revealIdx === -1，不播放彈跳動畫)
     const stripHTML = r.treasure
       ? `<div class="strip">
            <span class="chip green">${r.title}</span>
+           <span class="chip cream">${r.theme}</span>
            <div class="treasure">${treasureChest()}<span class="treasure-tag">尋寶提示</span><span>${r.treasure.replace(/^尋寶任務｜/, '')}</span></div>
          </div>`
-      : `<div class="strip">
-           <span class="chip green">${r.title}</span>
-           <span class="strip-text">物資募集中<em>最先備齊的隊伍得 4 分，依序 3、2、1 分</em></span>
-         </div>`;
+      : r.isPractice
+        ? `<div class="strip">
+             <span class="chip green">${r.title}</span>
+             <span class="chip cream">${r.theme}</span>
+             <span class="strip-text">試玩練習<em>各組完成物資支援，皆各加 5 分！</em></span>
+           </div>`
+        : `<div class="strip">
+             <span class="chip green">${r.title}</span>
+             <span class="chip cream">${r.theme}</span>
+             <span class="strip-text">物資募集中<em>最先備齊的隊伍得 4 分，依序 3、2、1 分</em></span>
+           </div>`;
 
+    arena.className = 'arena phase-3 no-anim';
     arena.innerHTML = `
       ${stripHTML}
       <div class="crew n${n}">
-        ${r.groups.map((g, i) => `
-          <article class="scard iso-card" style="animation-delay:${0.05 + i * 0.12}s">
+        ${r.groups.map((g, i) => {
+          const role = g.role || (g.name === '團長' ? '團長' : '組長');
+          const isTextQty = typeof g.quantity === 'string' && g.quantity.length > 2;
+          const supplyClass = g.supply.length > 14 ? ' xlong' : g.supply.length > 6 ? ' long' : '';
+          return `
+          <article class="scard iso-card">
             ${gem(teamCycle[i % 4])}
             <div class="scard-head">
               <span class="scard-name">${g.name}</span>
-              <span class="scard-leader">組長 ${g.leader}</span>
+              <span class="scard-leader">${role} ${g.leader}</span>
             </div>
             <div class="scard-body">
               ${n < 4 ? '<span class="scard-label">需求物資</span>' : ''}
               <div class="scard-row">
-                <span class="scard-supply${g.supply.length > 6 ? ' long' : ''}">${g.supply}</span>
-                ${g.quantity ? `<span class="scard-qty"><b>${g.quantity}</b><small>${g.unit || '件'}</small></span>` : ''}
+                <span class="scard-supply${supplyClass}">${g.supply}</span>
+                ${g.quantity ? `<span class="scard-qty${isTextQty ? ' text-qty' : ''}"><b>${g.quantity}</b><small>${g.unit || '件'}</small></span>` : ''}
               </div>
             </div>
-          </article>`).join('')}
+          </article>`;
+        }).join('')}
       </div>
       <div class="scoring">
         ${TEAMS.map((t, i) => `
           <button class="score-btn t-${t.id}" id="score-${t.id}" data-team="${t.id}" type="button"
-                  style="animation-delay:${0.45 + i * 0.1}s" aria-label="${t.name} 給分">
+                  aria-label="${t.name} 給分">
             <span class="sb-face">
               <span class="sb-info">
                 <span class="sb-order">${t.order}</span>
@@ -322,24 +415,39 @@
   }
 
   function updateScoreButtons() {
-    const nextPts = POINTS[state.order.length];
+    const isWaiting = state.phase === 3 && !state.started;
+    const isPractice = ROUNDS[state.round]?.isPractice;
+    const nextPts = isPractice ? 5 : POINTS[state.order.length];
     TEAMS.forEach(t => {
       const b = $('#score-' + t.id);
       if (!b) return;
       const idx = state.order.indexOf(t.id);
       const plus = b.querySelector('.sb-plus');
       const rank = b.querySelector('.sb-rank');
+
+      if (isWaiting) {
+        b.classList.remove('is-done');
+        b.classList.add('is-waiting');
+        b.disabled = true;
+        plus.textContent = '準備';
+        rank.textContent = '等待開始';
+        b.setAttribute('aria-label', `${t.name} 等待主持人宣布開始支援`);
+        return;
+      }
+
+      b.classList.remove('is-waiting');
       if (idx >= 0) {
         if (!b.classList.contains('is-done')) b.classList.add('is-done');
         b.disabled = true;
-        plus.textContent = '+' + POINTS[idx];
-        rank.textContent = `第 ${idx + 1} 名`;
-        b.setAttribute('aria-label', `${t.name} 第 ${idx + 1} 名，獲得 ${POINTS[idx]} 分`);
+        const pts = isPractice ? 5 : POINTS[idx];
+        plus.textContent = '+' + pts;
+        rank.textContent = isPractice ? '完成 +5分' : `第 ${idx + 1} 名`;
+        b.setAttribute('aria-label', `${t.name} 完成，獲得 ${pts} 分`);
       } else {
         b.classList.remove('is-done');
         b.disabled = false;
-        plus.textContent = nextPts ? '+' + nextPts : '';
-        rank.textContent = '按下給分';
+        plus.textContent = '+' + nextPts;
+        rank.textContent = isPractice ? '完成給分' : '按下給分';
         b.setAttribute('aria-label', `${t.name} 給分 +${nextPts}`);
       }
     });
@@ -401,23 +509,57 @@
       actionSub.textContent = 'SPACE · 下一步';
     } else if (p === 2) {
       actionLabel.textContent = '揭曉需求物資';
-      actionSub.textContent = 'SPACE · 下一步';
-    } else {
-      const done = state.order.length >= TEAMS.length;
-      if (done) {
-        const last = state.round >= ROUNDS.length - 1;
-        actionLabel.textContent = last ? '公布最終成績' : '進入下一回合';
-        actionSub.textContent = 'SPACE · 繼續';
-        actionBtn.classList.add('ready', 'next');
+      actionSub.textContent = 'SPACE · 依序放大介紹';
+    } else if (p === 3 && state.revealIdx >= 0) {
+      const r = ROUNDS[state.round];
+      const n = r.groups.length;
+      if (state.revealIdx < n - 1) {
+        actionLabel.textContent = '下一組需求物資';
+        actionSub.textContent = `SPACE · 揭曉 ${state.revealIdx + 2}/${n} 組`;
+        actionBtn.classList.add('ready');
       } else {
-        actionBtn.disabled = true;
-        actionLabel.textContent = `等待給分 ${state.order.length} / ${TEAMS.length}`;
-        actionSub.innerHTML = `<span class="wait-pips">${TEAMS.map(t =>
-          `<i class="t-${t.id}${state.order.includes(t.id) ? ' on' : ''}"></i>`).join('')}</span>`;
+        actionLabel.textContent = '完成揭曉物資';
+        actionSub.textContent = 'SPACE · 進入物資募集';
+        actionBtn.classList.add('ready', 'next');
+      }
+    } else if (p === 3 && !state.started) {
+      actionLabel.textContent = '開始支援';
+      actionSub.textContent = 'SPACE · 3秒倒數';
+      actionBtn.classList.add('ready');
+    } else {
+      const isPractice = ROUNDS[state.round]?.isPractice;
+      const done = state.order.length >= TEAMS.length;
+      if (isPractice) {
+        if (done) {
+          actionLabel.textContent = '遊戲正式開始';
+          actionSub.textContent = 'SPACE · 分數歸零並開始';
+          actionBtn.classList.add('ready', 'next');
+        } else if (state.order.length > 0) {
+          actionLabel.textContent = '遊戲正式開始';
+          actionSub.textContent = `${state.order.length}/${TEAMS.length} 組完成 · 分數歸零`;
+          actionBtn.classList.add('ready', 'next');
+        } else {
+          actionBtn.disabled = true;
+          actionLabel.textContent = `等待給分 0 / ${TEAMS.length}`;
+          actionSub.innerHTML = `<span class="wait-pips">${TEAMS.map(t =>
+            `<i class="t-${t.id}"></i>`).join('')}</span>`;
+        }
+      } else {
+        if (done) {
+          const last = state.round >= ROUNDS.length - 1;
+          actionLabel.textContent = last ? '公布最終成績' : '進入下一回合';
+          actionSub.textContent = 'SPACE · 繼續';
+          actionBtn.classList.add('ready', 'next');
+        } else {
+          actionBtn.disabled = true;
+          actionLabel.textContent = `等待給分 ${state.order.length} / ${TEAMS.length}`;
+          actionSub.innerHTML = `<span class="wait-pips">${TEAMS.map(t =>
+            `<i class="t-${t.id}${state.order.includes(t.id) ? ' on' : ''}"></i>`).join('')}</span>`;
+        }
       }
     }
 
-    undoBtn.disabled = !(p === 3 && state.order.length > 0);
+    undoBtn.disabled = !(p === 3 && state.started && state.order.length > 0);
   }
 
   function renderAll() {
@@ -429,13 +571,151 @@
   /* =========================================================
      操作
      ========================================================= */
+  /* ---------------- 音效 (Web Audio API) ---------------- */
+  let audioCtx = null;
+  function playBeep(freq, type = 'sine', duration = 0.25) {
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (!audioCtx && AudioCtxClass) audioCtx = new AudioCtxClass();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (e) { /* ignore */ }
+  }
+
+  /* ---------------- 倒數計時 ---------------- */
+  let countdownTimer = null;
+  let isCountingDown = false;
+
+  function startCountdown() {
+    if (isCountingDown) return;
+    isCountingDown = true;
+    countdownOverlay.style.display = 'flex';
+    countdownOverlay.classList.add('open');
+
+    countdownSub.textContent = '準備好了嗎？';
+
+    function showStep(num) {
+      if (!isCountingDown) return;
+      countdownNum.className = 'countdown-num';
+      void countdownNum.offsetWidth; // 重新觸發彈跳動畫
+
+      if (num > 0) {
+        countdownNum.textContent = num;
+        countdownNum.className = 'countdown-num animate';
+        playBeep(num === 3 ? 523 : num === 2 ? 659 : 784, 'sine', 0.28);
+        countdownTimer = setTimeout(() => {
+          showStep(num - 1);
+        }, 1000);
+      } else {
+        countdownNum.textContent = '開始支援！';
+        countdownNum.className = 'countdown-num animate go';
+        countdownSub.textContent = '火速送往舞台前線！';
+        playBeep(880, 'triangle', 0.35);
+        setTimeout(() => playBeep(1174, 'triangle', 0.45), 80);
+        confetti(80);
+
+        // 「開始支援！」顯示後 0.35 秒內自動直接關閉倒數遮罩！
+        countdownTimer = setTimeout(() => {
+          closeCountdownAndStart();
+        }, 350);
+      }
+    }
+
+    showStep(3);
+  }
+
+  function finishCountdown() {
+    closeCountdownAndStart();
+  }
+
+  function closeCountdownAndStart() {
+    if (countdownTimer) { clearTimeout(countdownTimer); countdownTimer = null; }
+    isCountingDown = false;
+    countdownOverlay.classList.remove('open');
+    countdownOverlay.style.display = 'none'; // 雙重保證遮罩立即關閉
+    state.started = true;
+    save();
+    renderAll(); // 完整更新物資題目、按鈕狀態與計分板！
+  }
+
+  function cancelCountdown() {
+    closeCountdownAndStart();
+  }
+
+  let practiceTimer = null;
+
+  function handlePracticeFinished() {
+    if (practiceTimer) clearTimeout(practiceTimer);
+    practiceTimer = setTimeout(() => {
+      startOfficialGame();
+    }, 1500);
+  }
+
+  function startOfficialGame() {
+    if (practiceTimer) { clearTimeout(practiceTimer); practiceTimer = null; }
+    cancelCountdown();
+    TEAMS.forEach(t => { state.totals[t.id] = 0; });
+    state.round = 1;
+    state.phase = 1;
+    state.revealIdx = 0;
+    state.started = false;
+    state.order = [];
+    save();
+    renderAll();
+    confetti(120);
+    openStartModal();
+  }
+
   function advance() {
     const p = state.phase;
     if (p === 'final') { openModal(); return; }
     if (p === 1) state.phase = 2;
-    else if (p === 2) state.phase = 3;
+    else if (p === 2) {
+      state.phase = 3;
+      state.revealIdx = 0; // 進入逐組放大介紹第 1 組
+      state.started = false;
+    }
     else if (p === 3) {
-      if (state.order.length < TEAMS.length) return; // 防呆：四隊未完成不可前進
+      const r = ROUNDS[state.round];
+      const n = r.groups.length;
+
+      // 1. 若還在逐組放大介紹物資
+      if (state.revealIdx >= 0) {
+        if (state.revealIdx < n - 1) {
+          state.revealIdx += 1; // 放大下一組
+        } else {
+          state.revealIdx = -1; // 介紹完畢，回到「物資募集中」總覽
+        }
+        save();
+        renderAll();
+        return;
+      }
+
+      // 2. 已經在物資募集中總覽，按開始支援觸發倒數
+      if (!state.started) {
+        startCountdown();
+        return;
+      }
+
+      // 3. 防呆：四隊未全部完成給分前，絕對不可切換離開題目畫面！
+      if (state.order.length < TEAMS.length) return;
+
+      const isPractice = ROUNDS[state.round]?.isPractice;
+      if (isPractice) {
+        startOfficialGame();
+        return;
+      }
       if (state.round >= ROUNDS.length - 1) {
         state.phase = 'final';
         state.order = [];
@@ -444,22 +724,47 @@
       }
       state.round += 1;
       state.phase = 1;
+      state.revealIdx = 0;
+      state.started = false;
       state.order = [];
     }
     save(); renderAll();
   }
 
   function goBack() {
-    if (state.phase === 2) state.phase = 1;
-    else if (state.phase === 3 && state.order.length === 0) state.phase = 2;
+    if (isCountingDown) {
+      cancelCountdown();
+      return;
+    }
+    if (state.phase === 2) {
+      state.phase = 1;
+    } else if (state.phase === 3) {
+      if (state.revealIdx > 0) {
+        state.revealIdx -= 1; // 回到上一組放大介紹
+      } else if (state.revealIdx === 0) {
+        state.phase = 2; // 回到代表就位
+      } else if (state.revealIdx === -1) {
+        // 如果在物資募集中總覽，尚未倒數開始支援前，可返回最後一組放大卡片
+        if (!state.started) {
+          const r = ROUNDS[state.round];
+          state.revealIdx = r.groups.length - 1;
+        } else if (state.order.length === 0) {
+          state.started = false; // 還原到等待開始支援狀態
+        }
+      }
+    }
     else return;
     save(); renderAll();
   }
 
   function score(teamId) {
     if (state.phase !== 3) return;
+    if (!state.started) {
+      closeCountdownAndStart(); // 點擊計分按鈕時，自動解鎖並給分
+    }
     if (state.order.includes(teamId) || state.order.length >= TEAMS.length) return;
-    const pts = POINTS[state.order.length];
+    const isPractice = ROUNDS[state.round]?.isPractice;
+    const pts = isPractice ? 5 : POINTS[state.order.length];
     state.order.push(teamId);
     state.totals[teamId] += pts;
     save();
@@ -467,12 +772,18 @@
     updateTotals(teamId, pts);
     renderTower();
     burst(teamId);
+
+    if (isPractice && state.order.length >= TEAMS.length) {
+      handlePracticeFinished();
+    }
   }
 
   function undo() {
-    if (state.phase !== 3 || !state.order.length) return;
+    if (state.phase !== 3 || !state.started || !state.order.length) return;
+    if (practiceTimer) { clearTimeout(practiceTimer); practiceTimer = null; }
+    const isPractice = ROUNDS[state.round]?.isPractice;
     const teamId = state.order.pop();
-    const pts = POINTS[state.order.length];
+    const pts = isPractice ? 5 : POINTS[state.order.length];
     state.totals[teamId] = Math.max(0, state.totals[teamId] - pts);
     save();
     updateScoreButtons();
@@ -481,6 +792,8 @@
   }
 
   function resetGame() {
+    if (practiceTimer) { clearTimeout(practiceTimer); practiceTimer = null; }
+    cancelCountdown();
     state = fresh();
     save();
     closeModal();
@@ -535,6 +848,17 @@
   /* ---------------- Modal ---------------- */
   function openModal() { modal.classList.add('open'); $('#modalCancel').focus(); }
   function closeModal() { modal.classList.remove('open'); }
+
+  function openStartModal() {
+    if (startPiks && !startPiks.children.length) {
+      startPiks.innerHTML = TEAMS.map(t => pikminSVG(t.id, 'start-pik')).join('');
+    }
+    startModal.classList.add('open');
+    startModalOk.focus();
+  }
+  function closeStartModal() {
+    startModal.classList.remove('open');
+  }
 
   /* =========================================================
      下半部裝飾（安全留白區）
@@ -628,14 +952,43 @@
   /* =========================================================
      事件
      ========================================================= */
-  actionBtn.addEventListener('click', () => { actionBtn.blur(); advance(); });
+  actionBtn.addEventListener('click', () => {
+    if (actionBtn.disabled) return;
+    actionBtn.blur();
+    advance();
+  });
   undoBtn.addEventListener('click', () => { undoBtn.blur(); undo(); });
   resetBtn.addEventListener('click', () => { resetBtn.blur(); openModal(); });
   $('#modalCancel').addEventListener('click', closeModal);
   $('#modalOk').addEventListener('click', resetGame);
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+  startModalOk.addEventListener('click', closeStartModal);
+  startModal.addEventListener('click', e => { if (e.target === startModal) closeStartModal(); });
+
+  if (countdownClose) {
+    countdownClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      countdownClose.blur();
+      closeCountdownAndStart();
+    });
+  }
+
   document.addEventListener('keydown', e => {
+    if (isCountingDown) {
+      if (['Escape', 'x', 'X', ' ', 'Enter'].includes(e.key)) {
+        e.preventDefault();
+        closeCountdownAndStart();
+      }
+      return;
+    }
+    if (startModal.classList.contains('open')) {
+      if (['Escape', ' ', 'Enter', 'ArrowRight', 'PageDown'].includes(e.key)) {
+        e.preventDefault();
+        closeStartModal();
+      }
+      return;
+    }
     if (modal.classList.contains('open')) {
       if (e.key === 'Escape') closeModal();
       return;

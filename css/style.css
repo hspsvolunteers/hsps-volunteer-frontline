@@ -237,6 +237,122 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 .crew.n4 .gcard-leader b { font-size: 38px; }
 .gcard-call { margin-top: 16px; font-size: 20px; font-weight: 900; letter-spacing: .3em; color: #b8860b; animation: blink 1.2s ease-in-out infinite; }
 
+/* ---------- 動畫抑制（返回總覽與倒數後不重播彈跳） ---------- */
+.arena.no-anim .scard,
+.arena.no-anim .score-btn,
+.arena.no-anim .strip,
+.arena.no-anim .gcard,
+.arena.no-anim .scene,
+.arena.no-anim .spotlight-card {
+  animation: none !important;
+}
+
+/* ---------- 逐組放大介紹物資卡 ---------- */
+.spotlight-card {
+  position: relative;
+  flex: 1; min-height: 0;
+  padding: 30px 48px 24px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  animation: popIn .55s var(--pop) both;
+}
+.spotlight-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding-bottom: 16px; border-bottom: 3px dashed #e3e9cf; flex: none;
+}
+.spotlight-badge {
+  display: flex; align-items: center; gap: 12px;
+}
+.spotlight-idx {
+  font-family: var(--font-num); font-size: 20px; font-weight: 800;
+  letter-spacing: .2em; color: var(--fg-soft);
+  background: #f1f4e6; padding: 6px 18px; border-radius: 999px;
+}
+.spotlight-who {
+  display: flex; align-items: center; gap: 20px;
+}
+.spotlight-name {
+  font-size: 58px; font-weight: 900; color: var(--g-deep); letter-spacing: .04em; line-height: 1;
+}
+.spotlight-leader {
+  display: inline-flex; align-items: baseline; gap: 10px;
+  padding: 8px 26px; border-radius: 999px;
+  background: var(--g-base); color: #fff;
+  box-shadow: 0 5px 0 var(--g-side), 0 10px 16px rgba(47,94,26,.25);
+}
+.spotlight-leader small { font-size: 20px; font-weight: 700; opacity: .9; }
+.spotlight-leader b { font-size: 34px; font-weight: 900; letter-spacing: .06em; }
+
+.spotlight-body {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 40px;
+  padding: 14px 0;
+}
+.spotlight-supply-wrap {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.spotlight-label {
+  font-size: 19px; font-weight: 800; letter-spacing: .24em; color: var(--fg-soft);
+}
+.spotlight-supply {
+  font-size: 44px; font-weight: 900; line-height: 1.32; letter-spacing: .03em;
+  color: var(--fg);
+}
+.spotlight-supply.long {
+  font-size: 34px;
+}
+.spotlight-qty-wrap {
+  flex: none;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.spotlight-qty {
+  display: inline-flex; align-items: baseline; justify-content: center; gap: 4px;
+  min-width: 140px; height: 104px; padding: 0 24px;
+  border-radius: 26px;
+  background: linear-gradient(160deg, #ffe27a 0%, #ffc93a 60%);
+  color: #5a3d00;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.6), 0 8px 0 #d49a12, 0 16px 22px rgba(160,110,10,.3);
+  line-height: 104px;
+}
+.spotlight-qty b { font-family: var(--font-num); font-size: 56px; font-weight: 900; }
+.spotlight-qty small { font-size: 26px; font-weight: 900; letter-spacing: .04em; }
+.spotlight-qty.text-qty {
+  min-width: auto; height: auto; padding: 14px 22px; line-height: 1.25;
+  flex-direction: column; align-items: center; justify-content: center;
+}
+.spotlight-qty.text-qty b {
+  font-family: var(--font); font-size: 26px; font-weight: 900; white-space: nowrap;
+}
+.spotlight-qty.text-qty small { font-size: 20px; font-weight: 700; }
+
+.spotlight-footer {
+  flex: none; display: flex; justify-content: center;
+  padding-top: 14px; border-top: 3px dashed #e3e9cf;
+}
+.spotlight-steps { display: flex; gap: 16px; }
+.spotlight-step {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 20px; border-radius: 999px;
+  background: #eef2df; color: #8e967d;
+  font-size: 19px; font-weight: 900; letter-spacing: .08em;
+  transition: all .25s;
+}
+.spotlight-step i {
+  font-family: var(--font-num); font-style: normal; font-size: 16px;
+  width: 24px; height: 24px; border-radius: 50%; background: #dce0cc;
+  display: grid; place-items: center; color: #626c51;
+}
+.spotlight-step.on {
+  background: var(--g-base); color: #fff;
+  box-shadow: 0 4px 0 var(--g-side);
+  transform: translateY(-2px);
+}
+.spotlight-step.on i { background: #fff; color: var(--g-deep); }
+.spotlight-step.done {
+  background: #dcebc4; color: var(--g-side);
+}
+.spotlight-step.done i { background: var(--g-side); color: #fff; }
+
 /* 階段三：物資卡（高度固定，內容不得溢出到下方計分按鈕） */
 .scard {
   position: relative;
@@ -254,6 +370,7 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 .scard-row { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .scard-supply { flex: 1; min-width: 0; font-size: 50px; font-weight: 900; line-height: 1.1; letter-spacing: .03em; color: var(--fg); }
 .scard-supply.long { font-size: 38px; }
+.scard-supply.xlong { font-size: 21px; line-height: 1.25; }
 .crew.n4 .scard-supply { font-size: 40px; }
 .crew.n4 .scard-supply.long { font-size: 30px; }
 .crew.n4 .scard-name { font-size: 26px; }
@@ -273,6 +390,16 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 }
 .scard-qty b { font-family: var(--font-num); font-size: 44px; font-weight: 900; }
 .scard-qty small { font-size: 20px; font-weight: 900; letter-spacing: .04em; }
+.scard-qty.text-qty {
+  min-width: auto; height: auto; padding: 6px 14px; line-height: 1.2;
+  border-radius: 14px;
+}
+.scard-qty.text-qty b {
+  font-family: var(--font); font-size: 20px; font-weight: 900; white-space: nowrap;
+}
+.scard-qty.text-qty small {
+  font-size: 16px; font-weight: 700;
+}
 .crew.n4 .scard-qty { min-width: 74px; height: 58px; line-height: 58px; padding: 0 10px; }
 .crew.n4 .scard-qty b { font-size: 38px; }
 
@@ -332,6 +459,23 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
   position: absolute; left: 26px; bottom: 26px; z-index: 2;
   font-family: var(--font-num); font-size: 14px; font-weight: 800;
   color: var(--ink-soft); opacity: .0;
+}
+
+/* 等待主持人按開始支援：鎖定狀態 */
+.score-btn.is-waiting {
+  cursor: not-allowed;
+  opacity: .82;
+}
+.score-btn.is-waiting .sb-face {
+  filter: saturate(.85) brightness(.97);
+}
+.score-btn.is-waiting .sb-plus {
+  font-size: 26px;
+  opacity: .35;
+}
+.score-btn.is-waiting .sb-rank {
+  color: var(--ink-soft);
+  font-size: 16px;
 }
 
 /* 已給分：凹陷鎖定 */
@@ -404,8 +548,8 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 .tracker-head { display: flex; flex-direction: column; }
 .eyebrow { font-family: var(--font-num); font-size: 15px; font-weight: 800; letter-spacing: .3em; color: var(--fg-soft); }
 .tracker-round { font-size: 40px; font-weight: 900; color: var(--g-deep); letter-spacing: .06em; line-height: 1.2; }
-.tracker-steps { display: flex; gap: 10px; }
-.tracker-steps svg { width: 52px; height: 44px; }
+.tracker-steps { display: flex; gap: 8px; }
+.tracker-steps svg { width: 44px; height: 38px; flex: 1; max-width: 48px; }
 .tracker-steps .cur { animation: hop 1.2s ease-in-out infinite; }
 .tracker-phases { display: flex; gap: 8px; }
 .tracker-phases span {
@@ -510,6 +654,71 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
   animation: fall linear forwards;
 }
 
+/* ---------- 3-2-1 倒數畫面 ---------- */
+.countdown-overlay {
+  position: absolute; inset: 0; z-index: 55;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(20, 32, 16, .45);
+  backdrop-filter: blur(4px);
+}
+.countdown-overlay.open { display: flex; }
+
+.countdown-close {
+  position: absolute; top: 32px; right: 36px; z-index: 60;
+  width: 58px; height: 58px; border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #ff5757 0%, #dc2626 100%);
+  color: #fff; font-size: 28px; font-weight: 900; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.5), 0 4px 0 #991b1b;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  user-select: none;
+}
+.countdown-close:hover {
+  transform: scale(1.08) translateY(-2px);
+  background: linear-gradient(135deg, #ff6b6b 0%, #ef4444 100%);
+  box-shadow: 0 12px 28px rgba(220, 38, 38, 0.65), 0 6px 0 #991b1b;
+}
+.countdown-close:active {
+  transform: scale(0.95) translateY(2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4), 0 2px 0 #991b1b;
+}
+
+.countdown-wrap {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.countdown-sub {
+  font-size: 42px; font-weight: 900; color: #fff;
+  letter-spacing: .25em; text-shadow: 0 4px 14px rgba(0,0,0,.5);
+  margin-bottom: 6px;
+  animation: rise .4s var(--pop) both;
+}
+.countdown-num {
+  font-family: var(--font-num);
+  font-size: 250px; font-weight: 900; line-height: 1;
+  color: #ffd34d;
+  text-shadow:
+    0 4px 0 #fff,
+    0 16px 0 #c98f0a,
+    0 28px 40px rgba(0,0,0,.55);
+}
+.countdown-num.animate {
+  animation: countPop .85s var(--pop) both;
+}
+.countdown-num.go {
+  font-family: var(--font);
+  font-size: 130px;
+  color: #b6e37a;
+  text-shadow:
+    0 4px 0 #fff,
+    0 16px 0 var(--g-side),
+    0 28px 40px rgba(0,0,0,.55);
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
 /* ---------- 確認視窗 ---------- */
 .modal {
   position: absolute; inset: 0; z-index: 60;
@@ -538,11 +747,81 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 .pill-btn:hover { transform: translateY(-2px); }
 .pill-btn:active { transform: translateY(6px); box-shadow: 0 1px 0 rgba(0,0,0,.2); }
 
+/* ---------- 遊戲正式開始 宣告視窗 ---------- */
+.start-modal {
+  position: absolute; inset: 0; z-index: 65;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(29, 42, 23, .58);
+  backdrop-filter: blur(8px);
+}
+.start-modal.open { display: flex; }
+.start-card {
+  width: 840px; padding: 46px 52px 48px; border-radius: 36px; text-align: center;
+  background: linear-gradient(170deg, #ffffff 0%, var(--bg-2) 100%);
+  box-shadow:
+    inset 0 3px 0 #fff,
+    0 18px 0 var(--card-side),
+    0 40px 60px rgba(0,0,0,.35);
+  animation: popIn .55s var(--pop) both;
+  display: flex; flex-direction: column; align-items: center;
+}
+.start-badge {
+  display: inline-block; padding: 6px 22px; border-radius: 999px;
+  background: var(--g-base); color: #fff; font-size: 18px; font-weight: 900; letter-spacing: .2em;
+  box-shadow: 0 4px 0 var(--g-side);
+  margin-bottom: 16px;
+}
+.start-title {
+  font-size: 58px; font-weight: 900; color: var(--g-deep);
+  letter-spacing: .04em; margin-bottom: 12px;
+  text-shadow: 0 2px 0 rgba(255,255,255,.9);
+}
+.start-desc {
+  font-size: 25px; font-weight: 700; color: var(--fg-soft);
+  line-height: 1.5; margin-bottom: 26px;
+}
+.start-desc strong { color: var(--fg); font-weight: 900; }
+.start-piks {
+  display: flex; justify-content: center; align-items: flex-end; gap: 28px;
+  margin-bottom: 32px; height: 110px;
+}
+.start-piks svg {
+  width: 76px; height: 110px;
+  filter: drop-shadow(0 6px 8px rgba(36,48,32,.18));
+}
+.start-actions { display: flex; justify-content: center; width: 100%; }
+.start-btn {
+  height: 84px; width: 420px; border-radius: 999px;
+  font-size: 32px; font-weight: 900; letter-spacing: .08em;
+  color: #fff;
+  background: linear-gradient(160deg, var(--g-light) 0%, var(--g-base) 55%);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.5), 0 14px 0 var(--g-side), 0 24px 28px rgba(47,94,26,.32);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  transition: transform .14s, box-shadow .14s;
+}
+.start-btn small {
+  font-family: var(--font-num); font-size: 16px; font-weight: 800; letter-spacing: .2em; opacity: .88;
+}
+.start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.5), 0 17px 0 var(--g-side), 0 28px 30px rgba(47,94,26,.36);
+}
+.start-btn:active {
+  transform: translateY(10px);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.5), 0 4px 0 var(--g-side), 0 8px 10px rgba(47,94,26,.25);
+}
+
 /* =========================================================
    動畫
    ========================================================= */
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes rise { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+@keyframes countPop {
+  0% { transform: scale(1.6); opacity: 0; filter: blur(6px); }
+  50% { transform: scale(.95); opacity: 1; filter: blur(0); }
+  75% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
 @keyframes popIn {
   0% { opacity: 0; transform: translateY(60px) scale(.7); }
   100% { opacity: 1; transform: none; }
