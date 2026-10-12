@@ -25,9 +25,8 @@ window.GAME_DATA = {
         '請各組就支援位置！'
       ],
       groups: [
-        { name: '團長', leader: '怡如', role: '團長', supply: '講解志工倫理讓大家取得特殊訓時數，需要各組全員到齊', quantity: '各組報到人數', unit: '人' },
-        { name: '副團長', leader: '依晴', role: '副團長', supply: '需要大家互相認識，彼此熟悉，請大家順時針各報姓名一次', quantity: 1, unit: '輪' },
-        { name: '副團長', leader: '依倫', role: '副團長', supply: '歡迎大家來到志工迎新，參加今天暖身活動，請找出椅背上名條', quantity: 3, unit: '張' }
+        { name: '團長', leader: '怡如', role: '團長', supply: '入校登記領取的志工背心', quantity: '1', unit: '件' },
+        { name: '副團長', leader: '依倫/依晴', role: '副團長', supply: '歡迎大家來到志工迎新，參加今天暖身活動，請找出椅背上名條', quantity: 3, unit: '張' },
       ]
     },
     {
@@ -39,9 +38,9 @@ window.GAME_DATA = {
         '課業輔導組來幫忙！'
       ],
       groups: [
-        { name: '國輔組', leader: '怡如', supply: '文具', quantity: 5, unit: '件' },
-        { name: '英輔組', leader: '依倫', supply: '英文元素物品', quantity: 3, unit: '件' },
-        { name: '數輔組', leader: '寧翔', supply: '有數字元素的物品', quantity: 3, unit: '件' }
+        { name: '國輔組', leader: '怡如', supply: '文具', quantity: 3, unit: '件' },
+        { name: '英輔組', leader: '依倫', supply: '英文元素物品', quantity: 1, unit: '件' },
+        { name: '數輔組', leader: '寧翔', supply: '有數字元素的物品', quantity: 1, unit: '件' }
       ]
     },
     {
@@ -54,8 +53,8 @@ window.GAME_DATA = {
         '請看各組所需支援物品！'
       ],
       groups: [
-        { name: '園藝組', leader: '純敏', supply: '綠色元素物品', quantity: 3, unit: '件' },
-        { name: '圖書組', leader: '維云', supply: '紙製品', quantity: 3, unit: '件' },
+        { name: '園藝組', leader: '純敏', role: '組員', supply: '綠色元素物品', quantity: 3, unit: '件' },
+        { name: '圖書組', leader: '維云', role: '副組長', supply: '紙製品', quantity: 3, unit: '件' },
         { name: '交通組', leader: '瑞芳', supply: '鑰匙、雨具', quantity: 2, unit: '件' }
       ]
     },
@@ -67,8 +66,8 @@ window.GAME_DATA = {
         '請看題目！'
       ],
       groups: [
-        { name: '生活媽媽', leader: '淑慧', supply: '購物袋', quantity: 1, unit: '個' },
-        { name: '健服組', leader: '心茹', supply: '保健防護用品', quantity: 4, unit: '件' },
+        { name: '生活媽媽', leader: '淑慧', role: '組員', supply: '購物袋、飲料提袋', quantity: 1, unit: '件' },
+        { name: '健服組', leader: '心茹', role: '組員', supply: '防疫用品', quantity: 4, unit: '件' },
         { name: '安全照護組', leader: '瑩臻', supply: '手錶', quantity: 2, unit: '支' }
       ]
     },
@@ -83,10 +82,10 @@ window.GAME_DATA = {
       /* 本回合物資藏在演藝廳角落：畫面會顯示尋寶提示 */
       treasure: '尋寶任務｜以下物資都藏在演藝廳的角落，快派皮皮出動搜索！',
       groups: [
-        { name: '茶藝組', leader: '瑩臻', supply: '茶元素物品', quantity: 1, unit: '件' },
-        { name: '人資組', leader: '杏如', supply: '志工背心', quantity: 1, unit: '件' },
-        { name: '熊熊組', leader: '怡如', supply: '玩偶', quantity: 1, unit: '隻' },
-        { name: '資訊美編組', leader: '孟孺', supply: '膠帶、剪刀、美工用品', quantity: 1, unit: '件' }
+        { name: '茶藝組', leader: '瑩臻', role: '副組長', supply: '陶製茶杯', quantity: 1, unit: '件' },
+        { name: '人資組', leader: '杏如', supply: '黃色志工背心', quantity: 1, unit: '件' },
+        { name: '熊熊組', leader: '怡如', role: '組員', supply: '小兔玩具', quantity: 1, unit: '件' },
+        { name: '資訊美編組', leader: '孟孺', supply: '活動文宣品', quantity: 1, unit: '件' }
       ]
     }
   ]

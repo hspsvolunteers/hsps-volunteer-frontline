@@ -65,6 +65,9 @@
   const startModal = $('#startModal');
   const startModalOk = $('#startModalOk');
   const startPiks = $('#startPiks');
+  const finalRoundModal = $('#finalRoundModal');
+  const finalRoundModalOk = $('#finalRoundModalOk');
+  const finalRoundPiks = $('#finalRoundPiks');
   const countdownOverlay = $('#countdownOverlay');
   const countdownClose = $('#countdownClose');
   const countdownSub = $('#countdownSub');
@@ -727,6 +730,13 @@
       state.revealIdx = 0;
       state.started = false;
       state.order = [];
+      save();
+      renderAll();
+      if (state.round === ROUNDS.length - 1) {
+        confetti(140);
+        openFinalRoundModal();
+      }
+      return;
     }
     save(); renderAll();
   }
@@ -794,6 +804,8 @@
   function resetGame() {
     if (practiceTimer) { clearTimeout(practiceTimer); practiceTimer = null; }
     cancelCountdown();
+    closeStartModal();
+    closeFinalRoundModal();
     state = fresh();
     save();
     closeModal();
@@ -858,6 +870,17 @@
   }
   function closeStartModal() {
     startModal.classList.remove('open');
+  }
+
+  function openFinalRoundModal() {
+    if (finalRoundPiks && !finalRoundPiks.children.length) {
+      finalRoundPiks.innerHTML = TEAMS.map(t => pikminSVG(t.id, 'start-pik')).join('');
+    }
+    finalRoundModal.classList.add('open');
+    finalRoundModalOk.focus();
+  }
+  function closeFinalRoundModal() {
+    finalRoundModal.classList.remove('open');
   }
 
   /* =========================================================
@@ -966,6 +989,9 @@
   startModalOk.addEventListener('click', closeStartModal);
   startModal.addEventListener('click', e => { if (e.target === startModal) closeStartModal(); });
 
+  finalRoundModalOk.addEventListener('click', closeFinalRoundModal);
+  finalRoundModal.addEventListener('click', e => { if (e.target === finalRoundModal) closeFinalRoundModal(); });
+
   if (countdownClose) {
     countdownClose.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -986,6 +1012,13 @@
       if (['Escape', ' ', 'Enter', 'ArrowRight', 'PageDown'].includes(e.key)) {
         e.preventDefault();
         closeStartModal();
+      }
+      return;
+    }
+    if (finalRoundModal.classList.contains('open')) {
+      if (['Escape', ' ', 'Enter', 'ArrowRight', 'PageDown'].includes(e.key)) {
+        e.preventDefault();
+        closeFinalRoundModal();
       }
       return;
     }

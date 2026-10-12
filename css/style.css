@@ -208,6 +208,7 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 
 /* ---------- 組別卡（階段二/三） ---------- */
 .crew { display: grid; gap: 26px; min-height: 0; }
+.crew.n2 { grid-template-columns: repeat(2, 1fr); gap: 28px; }
 .crew.n3 { grid-template-columns: repeat(3, 1fr); }
 .crew.n4 { grid-template-columns: repeat(4, 1fr); gap: 22px; }
 .phase-2 .crew { flex: 1; }
@@ -225,6 +226,7 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 .gcard-num { width: 74px; height: 74px; margin-bottom: 8px; }
 .gcard-eyebrow { font-size: 20px; font-weight: 700; letter-spacing: .24em; color: var(--fg-soft); }
 .gcard-name { font-size: 78px; font-weight: 900; line-height: 1.12; letter-spacing: .04em; color: var(--g-deep); margin: 4px 0 18px; white-space: nowrap; }
+.crew.n2 .gcard-name { font-size: 82px; }
 .crew.n4 .gcard-name { font-size: 60px; }
 .gcard-leader {
   display: inline-flex; align-items: baseline; gap: 12px;
@@ -234,6 +236,7 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 }
 .gcard-leader small { font-size: 22px; font-weight: 700; opacity: .85; letter-spacing: .1em; }
 .gcard-leader b { font-size: 44px; font-weight: 900; letter-spacing: .08em; }
+.crew.n2 .gcard-leader b { font-size: 46px; }
 .crew.n4 .gcard-leader b { font-size: 38px; }
 .gcard-call { margin-top: 16px; font-size: 20px; font-weight: 900; letter-spacing: .3em; color: #b8860b; animation: blink 1.2s ease-in-out infinite; }
 
@@ -371,6 +374,10 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 .scard-supply { flex: 1; min-width: 0; font-size: 50px; font-weight: 900; line-height: 1.1; letter-spacing: .03em; color: var(--fg); }
 .scard-supply.long { font-size: 38px; }
 .scard-supply.xlong { font-size: 21px; line-height: 1.25; }
+.crew.n2 .scard { padding: 14px 26px 16px; }
+.crew.n2 .scard-name { font-size: 32px; }
+.crew.n2 .scard-leader { font-size: 20px; padding: 4px 16px; }
+.crew.n2 .scard-supply.xlong { font-size: 23px; line-height: 1.32; }
 .crew.n4 .scard-supply { font-size: 40px; }
 .crew.n4 .scard-supply.long { font-size: 30px; }
 .crew.n4 .scard-name { font-size: 26px; }
@@ -809,6 +816,23 @@ button:focus-visible { outline: 4px solid rgba(255, 201, 61, .8); outline-offset
 .start-btn:active {
   transform: translateY(10px);
   box-shadow: inset 0 3px 0 rgba(255,255,255,.5), 0 4px 0 var(--g-side), 0 8px 10px rgba(47,94,26,.25);
+}
+
+/* 最終回合宣告卡片特色配色 */
+.final-card .start-badge {
+  background: linear-gradient(135deg, #ff7a45, #e04128);
+  box-shadow: 0 4px 0 #a82410;
+}
+.final-card .start-btn {
+  background: linear-gradient(160deg, #ffa940 0%, #fa541c 55%);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.5), 0 14px 0 #b32a08, 0 24px 28px rgba(179,42,8,.35);
+}
+.final-card .start-btn:hover {
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.5), 0 17px 0 #b32a08, 0 28px 30px rgba(179,42,8,.4);
+}
+.final-card .start-btn:active {
+  transform: translateY(10px);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.5), 0 4px 0 #b32a08, 0 8px 10px rgba(179,42,8,.25);
 }
 
 /* =========================================================

@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/reset.css?v=20261011_4">
-    <link rel="stylesheet" href="css/style.css?v=20261011_4">
+    <link rel="stylesheet" href="css/reset.css?v=20261012_2">
+    <link rel="stylesheet" href="css/style.css?v=20261012_2">
 </head>
 <body>
 <div id="viewport">
@@ -106,10 +106,26 @@
         </div>
       </div>
     </div>
+
+    <!-- 最終回合 宣告視窗 -->
+    <div class="start-modal" id="finalRoundModal" role="dialog" aria-modal="true" aria-labelledby="finalRoundModalTitle">
+      <div class="start-card final-card iso-card">
+        <div class="start-badge">FINAL ROUND</div>
+        <h2 id="finalRoundModalTitle" class="start-title">🔥 最終支援！</h2>
+        <p class="start-desc">各組的物資皆已備齊<br><strong>接下來是特殊全體總動員！</strong></p>
+        <div class="start-piks" id="finalRoundPiks"></div>
+        <div class="start-actions">
+          <button id="finalRoundModalOk" class="start-btn" type="button">
+            <span>開啟最終回合</span>
+            <small>SPACE · 繼續</small>
+          </button>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
-<script src="js/data.js?v=20261011_4"></script>
-<script src="js/app.js?v=20261011_4"></script>
+<script src="js/data.js?v=20261012_2"></script>
+<script src="js/app.js?v=20261012_2"></script>
 </body>
 </html>
